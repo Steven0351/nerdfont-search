@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ -n "$NERDFONT_DATA_FILE" ]; then
+    DATA_FILE="$NERDFONT_DATA_FILE"
+else
+    DATA_FILE="$SCRIPT_DIR/nerd-fonts-data.txt"
+fi
+
+if [[ ! -f "$DATA_FILE" ]]; then
+    echo "Error: Data file not found at $DATA_FILE" >&2
+    echo "Please create the data file first." >&2
+    exit 1
+fi
+
+# Use command-line arguments as initial search query
+QUERY="$*"
+
+if [[ -n "$QUERY" ]]; then
+    selected=$(cat "$DATA_FILE" | fzf --ansi --preview 'echo {}' --preview-window=up:1 --query "$QUERY")
+else
+    selected=$(cat "$DATA_FILE" | fzf --ansi --preview 'echo {}' --preview-window=up:1)
+fi
+
+if [[ -n "$selected" ]]; then
+    icon=$(echo "$selected" | awk '{print $NF}')
+
+    echo "$icon"
+
+    if command -v pbcopy &> /dev/null; then
+        echo -n "$icon" | pbcopy
+    elif command -v xclip &> /dev/null; then
+        echo -n "$icon" | xclip -selection clipboard
+    elif command -v xsel &> /dev/null; then
+        echo -n "$icon" | xsel --clipboard
+    fi
+fi
