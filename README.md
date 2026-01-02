@@ -93,7 +93,27 @@ cd nerdfont-search
 
 ## Usage
 
-### Search for icons
+### Neovim Plugin
+
+Requires [fzf-lua](https://github.com/ibhagwan/fzf-lua).
+
+```vim
+:NerdFontSearch
+:NerdFontSearch git
+```
+
+Or from Lua:
+
+```lua
+require("nerdfont-search").search()
+require("nerdfont-search").search({ query = "git" })
+```
+
+**Keybindings:**
+- `Enter`: Insert icon at cursor
+- `Ctrl-y`: Copy to clipboard
+
+### CLI: Search for icons
 
 ```bash
 nerdfont-search
