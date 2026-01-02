@@ -12,17 +12,26 @@ def parse_glyphs(input_file, output_file):
     pattern = r'"([^"]+)":\s*"([0-9a-fA-F]+)"'
     matches = re.findall(pattern, content)
 
+    converted_count = 0
+    skipped_count = 0
+
     with open(output_file, 'w', encoding='utf-8') as f:
         for name, hex_code in matches:
+            # Skip removed/old icons (nfold- prefix)
+            if name.startswith('nfold-'):
+                skipped_count += 1
+                continue
+
             try:
                 # Convert hex to Unicode character
                 char = chr(int(hex_code, 16))
                 # Add space after icon for proper rendering (some icons need two cells)
                 f.write(f"{name:<40} {char} \n")
+                converted_count += 1
             except ValueError:
                 print(f"Warning: Could not convert {name}: {hex_code}", file=sys.stderr)
 
-    print(f"Converted {len(matches)} icons to {output_file}")
+    print(f"Converted {converted_count} icons to {output_file} (skipped {skipped_count} removed icons)")
 
 if __name__ == "__main__":
     import os
